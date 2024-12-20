@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Lucida Bright
+, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(#bdc3c7, #ff5ccc,
+         #5b2c6f);
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 5px;
+      width: 90vw;
+      max-width: 400px;
+      height: 90vw;
+      max-height: 400px;
+    }
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5vw;
+      font-weight: bold;
+      background-color: #d2b4de;
+      border: 2px solid #000;
+      cursor: pointer;
+      aspect-ratio: 1;
+    }
+    .cell.taken {
+      cursor: not-allowed;
+    }
+    .result-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #FF4C4C;
+      color: #FF4C4C;
+      font-size: 2rem;
+    }
+    .result-screen.active {
+      display: flex;
+    }
+    .result-screen button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Responsive Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <div class="result-screen" id="result-screen">
+    <div id="result-message"></div>
+    <button onclick="newGame()">New Game</button>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const resultScreen = document.getElementById('result-screen');
+    const resultMessage = document.getElementById('result-message');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winningConditions = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    function checkWinner() {
+      for (let condition of winningConditions) {
+        const [a, b, c] = condition;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          gameActive = false;
+          showResult(`Player ${gameState[a]} Wins!`);
+          return;
+        }
+      }
+      if (!gameState.includes("")) {
+        gameActive = false;
+        showResult("It's a Draw!");
+      }
+    }
+
+    function handleCellClick(e) {
+      const cell = e.target;
+      const cellIndex = cell.getAttribute('data-index');
+
+      if (gameState[cellIndex] || !gameActive) return;
+
+      gameState[cellIndex] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add('taken');
+
+      checkWinner();
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function resetGame() {
+      gameActive = true;
+      currentPlayer = 'X';
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      board.innerHTML = "";
+      createBoard();
+    }
+
+    function newGame() {
+      resetGame();
+      resultScreen.classList.remove('active');
+    }
+
+    function showResult(message) {
+      resultMessage.textContent = message;
+      resultScreen.classList.add('active');
+    }
+
+    function createBoard() {
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('data-index', i);
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
